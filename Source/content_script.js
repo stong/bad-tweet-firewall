@@ -1,6 +1,15 @@
 if (window.MutationObserver) {
 	var observer = new MutationObserver(function (mutations) {
 		Array.prototype.forEach.call(mutations, function (m) {
+
+			var node = m.target;
+			while (node) {
+				if (!filterNode(node)) {
+					return;
+				}
+				node = node.parentNode;
+			}
+
 			if (m.type === 'childList') {
 				walk(m.target);
 			} else if (m.target.nodeType === 3) {
@@ -19,17 +28,30 @@ if (window.MutationObserver) {
 
 walk(document.body);
 
+function filterNode(node)
+{
+	var tagName = node.tagName ? node.tagName.toLowerCase() : "";
+	if (tagName == 'input' || tagName == 'textarea') {
+		return false;
+	}
+	if (node.classList && node.classList.contains('ace_editor')) {
+		return false;
+	}
+	if (node.getAttribute && (node.getAttribute("contenteditable") || node.getAttribute("spellcheck"))) {
+		return false;
+	}
+	return true;
+}
+
 function walk(node) 
 {
 	var child, next;
 	
+	if (!filterNode(node)) {
+		return
+	}
+
 	var tagName = node.tagName ? node.tagName.toLowerCase() : "";
-	if (tagName == 'input' || tagName == 'textarea') {
-		return;
-	}
-	if (node.classList && node.classList.contains('ace_editor')) {
-		return;
-	}
 	// special bullshit for twitter. this really should be a more general algorithm but its 5 am lol
 	if (tagName == 'span') {
 		next = node.nextSibling;
