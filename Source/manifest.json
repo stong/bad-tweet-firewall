@@ -1,14 +1,13 @@
 {
-	"manifest_version": 2,
-	"name": "Cloud To Butt",
+	"manifest_version": 3,
+	"name": "ML To Money Laundering",
 	"version": "1.0",
-	"description": "Replaces the text 'the cloud' with 'my butt'.",
+	"description": "Replaces the text 'machine learning' with 'money laundering'.",
 	"content_scripts": 
 	[
 		{
 			"matches": ["*://*/*"],
-			"js": ["content_script.js"],
-			"run_at": "document_end"
+			"js": ["content_script.js"]
 		}
 	]
 }

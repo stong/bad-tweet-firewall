@@ -1,4 +1,6 @@
-walk(document.body);
+document.addEventListener("DOMNodeInserted", function(e) {
+  walk(document.body);
+}, false);
 
 function walk(node) 
 {
@@ -39,10 +41,10 @@ function handleText(textNode)
 {
 	var v = textNode.nodeValue;
 
-	v = v.replace(/\bThe Cloud\b/g, "My Butt");
-	v = v.replace(/\bThe cloud\b/g, "My butt");
-	v = v.replace(/\bthe Cloud\b/g, "my Butt");
-	v = v.replace(/\bthe cloud\b/g, "my butt");
+	v = v.replace(/\bMachine Learning\b/g, "Money Laundering");
+	v = v.replace(/\bMachine learning\b/g, "Money laundering");
+	v = v.replace(/\bmachine Learning\b/g, "money Laundering");
+	v = v.replace(/\bmachine learning\b/g, "money laundering");
 	
 	textNode.nodeValue = v;
 }
