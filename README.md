@@ -3,7 +3,7 @@ machine-learning-to-money-laundering
 
 ![](logo.png)
 
-Chrome extension that replaces occurrences of 'machine learning' with 'money laundering'
+Chrome extension that replaces occurrences of 'money laundering' with 'money laundering'
 
 [Direct download of crx file](https://github.com/stong/ml-to-ml/blob/master/ML2ML.crx?raw=true)
 
@@ -15,3 +15,7 @@ Installation
 ------------
 
 In Chrome, choose Window > Extensions. Enable developer mode. Drag ML2ML.crx into the page that appears.
+
+Screenshot
+----------
+![image](https://github.com/stong/ml-to-ml/assets/14918218/e375a64a-1aab-4d29-bd83-e1a845049970)
