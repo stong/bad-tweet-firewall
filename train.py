@@ -59,14 +59,11 @@ filtered_data = [] + negative_force + positive + negative
 random.shuffle(filtered_data)
 print('total',len(filtered_data))
 
-for x in filtered_data:
-    x['target'] = torch.tensor([x['target']])
-
 # Create PyTorch Dataset
 class TweetDataset(Dataset):
     def __init__(self, data):
         self.embeddings = torch.tensor([d['embedding'] for d in data], dtype=torch.float32)
-        self.targets = torch.tensor([d['target'] for d in data], dtype=torch.float32).reshape(-1, 1).squeeze().long()
+        self.targets = torch.tensor([d['target'] for d in data], dtype=torch.float32).reshape(-1, 1)
     
     def __len__(self):
         return len(self.embeddings)
@@ -83,8 +80,8 @@ class TweetRegressor(nn.Module):
             nn.GELU(),
             nn.Linear(64, 16),
             nn.GELU(),
-            nn.Linear(16, 2),
-            nn.Softmax(dim=-1)
+            nn.Linear(16, 1),
+            nn.Sigmoid() # 0 to 1
         )
     
     def forward(self, x):
@@ -105,7 +102,7 @@ train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE)
 # Initialize model, loss, and optimizer
 model = TweetRegressor()
-criterion = nn.NLLLoss()
+criterion = nn.MSELoss()
 
 # Training loop
 num_epochs = 3000
@@ -123,7 +120,7 @@ def lr_lambda(current_step):
         progress = float(current_step - warmup_steps) / float(max(1, total_steps - warmup_steps))
         return 0.5 * (1.0 + math.cos(math.pi * progress))
 
-optimizer = torch.optim.AdamW(model.parameters(), lr=0.0001)
+optimizer = torch.optim.AdamW(model.parameters(), lr=0.00005)
 scheduler = LambdaLR(optimizer, lr_lambda)
 
 best_val_loss = float('inf')
@@ -160,17 +157,19 @@ for epoch in tqdm(range(num_epochs)):
         current_lr = optimizer.param_groups[0]['lr']
         print(f'Epoch {epoch+1}, Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}, LR: {current_lr:.6f}, step: {step}')
     
-    if val_loss >= best_val_loss and ((val_loss - best_val_loss)/abs(val_loss) >= 0.02):
-        print("early stopping due to exceeded best val loss", val_loss,best_val_loss)
-        break
     
     # Save best model
     if val_loss < best_val_loss:
         best_val_loss = val_loss
         best_model = model.state_dict()
 
+    if val_loss >= best_val_loss*1.02:
+        print("early stopping due to exceeded best val loss")
+        break
+
 # Save the model
 torch.save(best_model, 'tweet_regressor.pt')
+
 
 # eval
 model.eval()
@@ -181,9 +180,8 @@ false_negatives = 0
 with torch.no_grad():
     for embeddings, targets in val_loader:
         outputs = model(embeddings)
-        predictions = outputs.argmax(dim=1)
+        predictions = torch.where(outputs > 0.5, 1.0, 0.0)
         
-        # Calculate metrics
         true_positives += ((predictions == 1) & (targets == 1)).sum().item()
         false_positives += ((predictions == 1) & (targets == 0)).sum().item()
         false_negatives += ((predictions == 0) & (targets == 1)).sum().item()

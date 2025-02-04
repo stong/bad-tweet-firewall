@@ -204,10 +204,10 @@ async function scanTweetForHarmful(tweet) {
         console.log(`Tweet ${tweetId} is has score ${score}`);
     }
     const score = tweetScoresCache.get(tweetId);
-    if (score < 0.01) {
+    if (score > 0.5) {
         tweet.style.borderWidth = '5px';
         tweet.style.borderColor = 'red';
-        // await saveHarmful(tweetId, score);
+        await saveHarmful(tweetId, score);
     }
 }
 
@@ -315,7 +315,6 @@ async function getTweetHarmScore(tweet) {
     const tweetText = getTweetText(tweet);
     const embedding = await getTextEmbedding(username + ": " + tweetText);
     const classifierOutput = await classifyEmbedding(embedding);
-    console.log(classifierOutput);
     return classifierOutput;
 }
 

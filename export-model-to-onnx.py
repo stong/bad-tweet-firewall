@@ -10,8 +10,8 @@ class TweetRegressor(nn.Module):
             nn.GELU(),
             nn.Linear(64, 16),
             nn.GELU(),
-            nn.Linear(16, 2),
-            nn.Softmax(dim=-1)
+            nn.Linear(16, 1),
+            nn.Sigmoid()  # -1 to 1
         )
     
     def forward(self, x):
@@ -30,7 +30,7 @@ torch.onnx.export(model,
                  dummy_input, 
                  "Source/tweet_regressor.onnx",
                  export_params=True,
-                 opset_version=13,
+                 opset_version=12,
                  do_constant_folding=True,
                  input_names=['input'],
                  output_names=['output'],
