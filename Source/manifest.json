@@ -1,14 +1,26 @@
 {
-	"manifest_version": 3,
-	"name": "ML To Money Laundering",
-	"version": "1.0",
-	"description": "Replaces the text 'machine learning' with 'money laundering'.",
-	"content_scripts": 
-	[
-		{
-			"matches": ["*://*/*"],
-			"js": ["content_script.js"]
-		}
-	]
+    "manifest_version": 3,
+    "name": "Bad Tweet Firewall",
+    "version": "1.0",
+    "description": "Analyzes your Twitter timeline",
+    "action": {
+    },
+    "content_scripts": 
+    [
+        {
+            "matches": [
+                "https://*.twitter.com/*",
+                "https://*.x.com/*"
+            ],
+            "js": ["onnxruntime-web.min.js","api-key.js","content_script.js"]
+        }
+    ],
+    "web_accessible_resources": [{
+        "resources": ["tweet_regressor.onnx", "ort-wasm-simd-threaded.wasm", "ort-wasm-simd-threaded.mjs"],
+        "matches": ["https://twitter.com/*", "https://x.com/*"]
+    }],
+    "permissions": [
+        "storage"
+    ]
 }
 
