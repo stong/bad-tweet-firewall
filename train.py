@@ -170,10 +170,27 @@ for epoch in tqdm(range(num_epochs)):
 # Save the model
 torch.save(best_model, 'tweet_regressor.pt')
 
-# Print some example predictions
+
+# eval
 model.eval()
+true_positives = 0
+false_positives = 0
+false_negatives = 0
+
 with torch.no_grad():
-    for i in range(min(5, len(val_dataset))):
-        embedding, target = val_dataset[i]
-        pred = model(embedding)
-        print(f'Target: {target.item():.3f}, Prediction: {pred.item():.3f}')
+    for embeddings, targets in val_loader:
+        outputs = model(embeddings)
+        predictions = torch.where(outputs > 0.5, 1.0, 0.0)
+        
+        true_positives += ((predictions == 1) & (targets == 1)).sum().item()
+        false_positives += ((predictions == 1) & (targets == 0)).sum().item()
+        false_negatives += ((predictions == 0) & (targets == 1)).sum().item()
+
+precision = true_positives / (true_positives + false_positives) if (true_positives + false_positives) > 0 else 0
+recall = true_positives / (true_positives + false_negatives) if (true_positives + false_negatives) > 0 else 0
+f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+
+print(f"\nEvaluation Metrics:")
+print(f"Precision: {precision:.4f}")
+print(f"Recall: {recall:.4f}")
+print(f"F1 Score: {f1:.4f}")
