@@ -40,7 +40,11 @@ These are all examples from my personal curated algorithm. You can train the ext
 
 ## How does it work?
 
-Tweet username + content -> OpenAI `text-embedding-3-small` -> 256 dimensions embedding -> binary classifier
+Inference: Tweet username + content -> OpenAI `text-embedding-3-small` -> 256 dimensions embedding -> binary classifier
+
+Data: It puts all the shit into IndexedDB on x.com Lol
+
+Training: Piece of shit training script (see `train.py`)
 
 # How to personalize (train) your own algorithm instructions
 
