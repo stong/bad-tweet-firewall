@@ -205,8 +205,24 @@ async function scanTweetForHarmful(tweet) {
     }
     const score = tweetScoresCache.get(tweetId);
     if (score > 0.5) {
+        // Apply red border
         tweet.style.borderWidth = '5px';
         tweet.style.borderColor = 'red';
+        
+        // Apply blur effect
+        tweet.style.filter = 'blur(4px)';
+        tweet.style.transition = 'filter 0.1s ease';
+        
+        // Remove blur on hover
+        tweet.addEventListener('mouseenter', () => {
+            tweet.style.filter = 'none';
+        });
+        
+        // Reapply blur when not hovering
+        tweet.addEventListener('mouseleave', () => {
+            tweet.style.filter = 'blur(4px)';
+        });
+        
         await saveHarmful(tweetId, score);
     }
 }
